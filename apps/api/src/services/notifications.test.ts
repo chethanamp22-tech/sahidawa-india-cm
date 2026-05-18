@@ -1,3 +1,8 @@
+// Fix: Mock WebSocket for Node.js versions < 22 to prevent Supabase Realtime client crash during test imports
+if (typeof globalThis.WebSocket === "undefined") {
+    globalThis.WebSocket = class {} as any;
+}
+
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
