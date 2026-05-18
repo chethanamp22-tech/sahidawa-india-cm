@@ -54,24 +54,17 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(limiter);
 
-morgan.token("status", (req: Request, res: Response) => {
-    const status = res.statusCode;
-    if (status >= 500) return "error";
-    if (status >= 400) return "warn";
-    return "info";
-});
-
-app.use(morgan(":method :url :status - :response-time ms"));
-
-morgan((tokens, req: Request, res: Response) => {
-    const status = res.statusCode;
-    const level = status >= 500 ? "error" : status >= 400 ? "warn" : "info";
-    logger.log({
-        level,
-        message: `${tokens.method(req, res)} ${tokens.url(req, res)} ${status} - ${tokens["response-time"](req, res)} ms`,
-    });
-    return undefined;
-});
+app.use(
+    morgan((tokens, req: Request, res: Response) => {
+        const status = res.statusCode;
+        const level = status >= 500 ? "error" : status >= 400 ? "warn" : "info";
+        logger.log({
+            level,
+            message: `${tokens.method(req, res)} ${tokens.url(req, res)} ${status} - ${tokens["response-time"](req, res)} ms`,
+        });
+        return undefined;
+    })
+);
 
 app.get("/", (req: Request, res: Response) => {
     logger.info("Root route accessed");
